@@ -34,5 +34,46 @@
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
+  <script>
+    let fullscreenImg = null;
+
+    function showFullScreenImage(imageUrl) {
+      if (!fullscreenImg) {
+        fullscreenImg = document.createElement("img");
+        fullscreenImg.src = imageUrl;
+        fullscreenImg.style.position = "fixed";
+        fullscreenImg.style.top = "0";
+        fullscreenImg.style.left = "0";
+        fullscreenImg.style.width = "100vw";
+        fullscreenImg.style.height = "100vh";
+        fullscreenImg.style.objectFit = "contain";
+        fullscreenImg.style.backgroundColor = "black";
+        fullscreenImg.style.zIndex = "9999";
+        fullscreenImg.style.cursor = "pointer";
+
+        // Double-click to exit full-screen
+        fullscreenImg.ondblclick = function () {
+          exitFullScreenImage();
+        };
+
+        document.body.appendChild(fullscreenImg);
+      }
+    }
+
+    function exitFullScreenImage() {
+      if (fullscreenImg) {
+        document.body.removeChild(fullscreenImg);
+        fullscreenImg = null;
+      }
+    }
+
+    function toggleFullScreenImage(imageUrl) {
+      if (fullscreenImg) {
+        exitFullScreenImage();
+      } else {
+        showFullScreenImage(imageUrl);
+      }
+    }
+  </script>
 </body>
 </html>

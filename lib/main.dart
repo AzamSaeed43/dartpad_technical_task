@@ -14,7 +14,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'Flutter Task', home: const HomePage());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+        title: 'Flutter Task', home: const HomePage());
   }
 }
 
@@ -58,7 +60,6 @@ class _HomePageState extends State<HomePage> {
   </div>
 """;
     return Scaffold(
-      appBar: AppBar(),
       body: imageUrl != null && isFullScreenImage
           ? SizedBox(
               height: double.infinity,

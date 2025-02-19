@@ -61,23 +61,20 @@ class _HomePageState extends State<HomePage> {
 """;
     return Scaffold(
       body: imageUrl != null && isFullScreenImage
-          ? SizedBox(
-              height: double.infinity,
-              width: double.infinity,
-              child: SingleChildScrollView(
-                child: Html(
-                  data: htmlContent,
-                  style: {
-                    "div": Style(
-                      width: Width(100, Unit.auto),
-                      height: Height(100, Unit.auto),
-                      display: Display.block,
-                      alignment: Alignment.center,
-                    ),
-                  },
-                ),
+          ? Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Html(
+                    data: htmlContent,
+                    shrinkWrap: true,
+                  ),
+                ],
               ),
-            )
+            ),
+          )
           : Padding(
               padding: const EdgeInsets.fromLTRB(32, 16, 32, 16),
               child: Column(

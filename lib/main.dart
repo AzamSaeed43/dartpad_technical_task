@@ -1,7 +1,6 @@
 import 'dart:html' as html;
 import 'dart:ui_web' as ui;
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'dart:js' as js;
 
@@ -106,14 +105,10 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: imageUrl != null && isFullScreenImage
           ? Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    HtmlElementView(viewType: viewType),
-                  ],
-                ),
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: HtmlElementView(viewType: viewType),
               ),
             )
           : Padding(

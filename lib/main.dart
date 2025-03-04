@@ -1,3 +1,5 @@
+import 'dart:html' as html;
+import 'dart:ui_web' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -15,8 +17,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-        title: 'Flutter Task', home: const HomePage());
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Task',
+        home: const HomePage());
   }
 }
 
@@ -52,29 +55,67 @@ class _HomePageState extends State<HomePage> {
     js.context.callMethod("toggleFullScreenImage", [imageUrl]);
   }
 
+  late html.DivElement imageContainer;
+
+  late String viewType;
+
+  @override
+  void initState() {
+    super.initState();
+    setupHtmlElement();
+  }
+
+  void setupHtmlElement() {
+    viewType = "web-image-element-${DateTime.now().millisecondsSinceEpoch}";
+
+    // Register the HTML element with Flutter's view registry
+    ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
+      final div = html.DivElement()
+        ..style.width = "100%"
+        ..style.height = "100%"
+        ..setInnerHtml("""
+        <div id="image-container" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+          <img id="custom-image" src="${imageUrl}" alt="Image"
+               style="cursor: pointer; max-width: 100%; max-height: 100%;">
+        </div>
+      """, treeSanitizer: html.NodeTreeSanitizer.trusted);
+
+      return div;
+    });
+  }
+
+  void runJavaScript() {
+    js.context.callMethod("eval", [
+      """
+      (function() {
+        document.addEventListener("DOMContentLoaded", function() {
+          var image = document.getElementById("custom-image");
+          if (image) {
+            image.oncontextmenu = function(event) {
+              console.log("Right-click detected on image");
+            };
+          }
+        });
+      })();
+    """
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
-    String htmlContent = """
-  <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-    <img src="$imageUrl" alt="Image">
-  </div>
-""";
     return Scaffold(
       body: imageUrl != null && isFullScreenImage
           ? Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Html(
-                    data: htmlContent,
-                    shrinkWrap: true,
-                  ),
-                ],
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    HtmlElementView(viewType: viewType),
+                  ],
+                ),
               ),
-            ),
-          )
+            )
           : Padding(
               padding: const EdgeInsets.fromLTRB(32, 16, 32, 16),
               child: Column(
@@ -84,20 +125,7 @@ class _HomePageState extends State<HomePage> {
                     child: imageUrl != null
                         ? InkWell(
                             onDoubleTap: toggleImageFullScreen,
-                            child: Html(
-                              data: htmlContent,
-                              shrinkWrap: true,
-                              style: {
-                                "div": Style(
-                                  width: Width(500, Unit.percent), // Full width
-                                  height:
-                                      Height(500, Unit.percent), // Full height
-                                  display: Display.block,
-                                  alignment: Alignment.center,
-                                ),
-                              },
-                            ),
-                          )
+                            child: HtmlElementView(viewType: viewType))
                         : AspectRatio(
                             aspectRatio: 1,
                             child: Container(
